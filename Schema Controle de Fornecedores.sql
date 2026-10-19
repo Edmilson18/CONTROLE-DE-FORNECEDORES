@@ -1,39 +1,49 @@
--- CRIANDO O BANCO DE DADOS FORNECEDORES
-CREATE DATABASE fornecedores;
+-- Esquema inicial do Sistema de Controle de Fornecedores.
+-- Este script cria um banco novo e não apaga nem atualiza tabelas existentes.
+
+CREATE DATABASE fornecedores
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
 USE fornecedores;
 
--- CRIANDO AS TABELAS DO BANCO
 CREATE TABLE fornecedores (
-	id INT NOT NULL AUTO_INCREMENT,
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     nome VARCHAR(200) NOT NULL,
-    cnpj VARCHAR(14) NOT NULL,
-    telefone VARCHAR(14) NOT NULL,
+    cnpj VARCHAR(18) NOT NULL,
+    telefone VARCHAR(20) NOT NULL,
     cidade VARCHAR(200) NOT NULL,
-    PRIMARY KEY(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    PRIMARY KEY (id),
+    KEY idx_fornecedores_nome (nome),
+    KEY idx_fornecedores_cnpj (cnpj)
+) ENGINE=InnoDB;
 
 CREATE TABLE compras (
-	id INT NOT NULL AUTO_INCREMENT,
-    data TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    valor FLOAT NOT NULL,
-    fornecedores_id INT,
-    PRIMARY KEY(id),
-    KEY fornecedores_id(fornecedores_id),
-    CONSTRAINT fk_fornecedores FOREIGN KEY (fornecedores_id) REFERENCES fornecedores (id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    data DATE NOT NULL,
+    valor DECIMAL(12, 2) NOT NULL,
+    fornecedores_id INT UNSIGNED NULL,
+    status ENUM('pendente', 'pago', 'cancelado') NOT NULL DEFAULT 'pendente',
+    PRIMARY KEY (id),
+    KEY idx_compras_fornecedor (fornecedores_id),
+    KEY idx_compras_status_data (status, data),
+    CONSTRAINT fk_compras_fornecedor
+        FOREIGN KEY (fornecedores_id)
+        REFERENCES fornecedores (id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
 
 CREATE TABLE pagamentos (
-	id INT NOT NULL AUTO_INCREMENT,
-    compra_id INT,
-    valor FLOAT,
-    data TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(id),
-    KEY compra_id(compra_id),
-    CONSTRAINT fk_compras FOREIGN KEY (compra_id) REFERENCES compras (id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- AJUSTANDO ERROS INICIAIS
-ALTER TABLE fornecedores.compras ADD COLUMN status ENUM('pendente', 'pago', 'cancelado') NOT NULL DEFAULT 'pendente';
-ALTER TABLE fornecedores MODIFY COLUMN cnpj VARCHAR(18) NOT NULL;
-ALTER TABLE pagamentos MODIFY COLUMN data DATE NOT NULL;
-ALTER TABLE compras MODIFY COLUMN data DATE NOT NULL;
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    compra_id INT UNSIGNED NOT NULL,
+    valor DECIMAL(12, 2) NOT NULL,
+    data DATE NOT NULL,
+    PRIMARY KEY (id),
+    KEY idx_pagamentos_compra_data (compra_id, data),
+    CONSTRAINT fk_pagamentos_compra
+        FOREIGN KEY (compra_id)
+        REFERENCES compras (id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE=InnoDB;

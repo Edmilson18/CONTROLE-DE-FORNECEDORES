@@ -1,0 +1,18 @@
+# Dependências instaladas localmente
+/node_modules/
+/vendor/
+
+# Configurações e credenciais locais
+.env
+.env.*
+!.env.example
+
+# Testes e registros locais
+.phpunit.cache/
+.phpunit.result.cache
+*.log
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
