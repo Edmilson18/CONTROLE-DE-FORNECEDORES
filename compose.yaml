@@ -1,0 +1,24 @@
+services:
+  banco:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: fornecedores
+      MARIADB_USER: fornecedores
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no arquivo .env da raiz}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Defina DB_ROOT_PASSWORD no arquivo .env da raiz}
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - dados_mariadb:/var/lib/mysql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mariadb-admin ping --host=127.0.0.1 --user=root --password="$${MARIADB_ROOT_PASSWORD}" --silent
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  dados_mariadb:

@@ -1,6 +1,11 @@
 # Dependências instaladas localmente
 /node_modules/
 /vendor/
+**/node_modules/
+**/dist/
+**/.angular/
+/backups/
+/.local/
 
 # Configurações e credenciais locais
 .env

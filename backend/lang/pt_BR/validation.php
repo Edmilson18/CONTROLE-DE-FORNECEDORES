@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'required' => 'O campo :attribute é obrigatório.',
+    'string' => 'O campo :attribute deve ser um texto.',
+    'email' => 'Informe um e-mail válido.',
+    'unique' => 'Este :attribute já está cadastrado.',
+    'exists' => 'O valor selecionado para :attribute não está disponível.',
+    'in' => 'O valor de :attribute é inválido.',
+    'integer' => 'O campo :attribute deve ser um número inteiro.',
+    'numeric' => 'O campo :attribute deve ser numérico.',
+    'boolean' => 'O campo :attribute deve ser verdadeiro ou falso.',
+    'date_format' => 'O campo :attribute deve usar o formato :format.',
+    'after_or_equal' => 'O campo :attribute deve ser igual ou posterior a :date.',
+    'before_or_equal' => 'O campo :attribute deve ser igual ou anterior a :date.',
+    'decimal' => 'O campo :attribute deve ter no máximo duas casas decimais.',
+    'regex' => 'O formato do campo :attribute é inválido.',
+    'confirmed' => 'A confirmação de :attribute não confere.',
+    'current_password' => 'A senha atual está incorreta.',
+    'min' => ['numeric' => 'O campo :attribute deve ser no mínimo :min.', 'string' => 'O campo :attribute deve ter pelo menos :min caracteres.'],
+    'max' => ['numeric' => 'O campo :attribute deve ser no máximo :max.', 'string' => 'O campo :attribute deve ter no máximo :max caracteres.'],
+    'between' => ['numeric' => 'O campo :attribute deve estar entre :min e :max.'],
+    'password' => ['mixed' => 'A senha deve conter letras maiúsculas e minúsculas.', 'numbers' => 'A senha deve conter ao menos um número.'],
+    'attributes' => ['name' => 'nome', 'password' => 'senha', 'current_password' => 'senha atual', 'fornecedores_id' => 'fornecedor', 'cnpj' => 'CNPJ', 'role' => 'perfil'],
+];

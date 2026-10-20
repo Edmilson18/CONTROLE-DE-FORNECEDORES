@@ -79,19 +79,19 @@
 
                 <!-- Todos os botões e links juntos -->
                 <div class="flex items-center space-x-3">
-                    <a href="/Controle%20de%20Fornecedores/contato.php" 
+                    <a href="/Controle-de-Fornecedores/contato.php"
                        class="group relative px-3 py-2 text-primary-dark dark:text-primary-light hover:text-primary-light transition-colors">
                         Contato
                         <span class="absolute left-0 -bottom-0.5 h-0.5 w-0 bg-primary-dark dark:bg-primary-light group-hover:w-full transition-all"></span>
                     </a>
 
-                    <a href="/Controle%20de%20Fornecedores/sobre.php" 
+                    <a href="/Controle-de-Fornecedores/sobre.php"
                        class="group relative px-3 py-2 text-primary-dark dark:text-primary-light hover:text-primary-light transition-colors">
                         Sobre
                         <span class="absolute left-0 -bottom-0.5 h-0.5 w-0 bg-primary-dark dark:bg-primary-light group-hover:w-full transition-all"></span>
                     </a>
 
-                    <a href="\Controle de Fornecedores\" id="homeButton"
+                    <a href="/Controle-de-Fornecedores/" id="homeButton"
                        class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 
                        transition-all duration-200 shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark"
                        title="Início">
