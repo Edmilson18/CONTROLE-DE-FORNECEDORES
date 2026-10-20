@@ -1,5 +1,11 @@
 export type Role = 'admin' | 'operador' | 'consulta';
-export interface User { id: number; name: string; email: string; role: Role; ativo: boolean; }
+export interface User { id: number; name: string; email: string; role: Role; ativo: boolean; password_setup_required: boolean; }
+export type AccessRequestStatus = 'pending' | 'approved' | 'rejected' | 'completed';
+export interface AccountAccessRequest {
+  id: number; name: string; email: string; message: string; status: AccessRequestStatus;
+  response_message: string | null; reviewed_at: string | null; completed_at: string | null;
+  created_at: string; reviewer: {id: number; name: string} | null;
+}
 export interface Supplier { id: number; nome: string; cnpj: string; telefone: string; cidade: string; arquivado: boolean; }
 export interface Payment { id: number; compra_id: number; valor: string; data: string; estornado_em: string | null; motivo_estorno: string | null; }
 export interface Purchase {

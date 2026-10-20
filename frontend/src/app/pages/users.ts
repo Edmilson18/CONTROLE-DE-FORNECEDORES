@@ -10,7 +10,7 @@ import { Pagination } from '../shared/pagination';
     <app-feedback [error]="error()" [success]="success()" [loading]="loading()" />
     @if (editing()) {<section class="panel form-panel"><h2>{{ id() ? 'Editar usuário' : 'Novo usuário' }}</h2><form [formGroup]="form" (ngSubmit)="save()"><div class="form-grid">
       <label>Nome *<input formControlName="name" maxlength="200" required></label><label>E-mail *<input type="email" formControlName="email" autocomplete="off" required></label>
-      <label>{{ id() ? 'Nova senha (opcional)' : 'Senha *' }}<input type="password" formControlName="password" autocomplete="new-password" minlength="12" maxlength="128"><small>12 caracteres, maiúscula, minúscula e número.</small></label>
+      <label>{{ id() ? 'Nova senha (opcional)' : 'Senha *' }}<input type="password" formControlName="password" autocomplete="new-password" minlength="8" maxlength="128"><small>8 caracteres, maiúscula, minúscula e número.</small></label>
       <label>Perfil<select formControlName="role"><option value="consulta">Consulta</option><option value="operador">Operador</option><option value="admin">Administrador</option></select></label>
       <label class="checkbox-label"><input type="checkbox" formControlName="ativo"> Conta ativa</label>
       </div><div class="form-actions"><button type="button" class="secondary" (click)="editing.set(false)">Cancelar</button><button class="primary" [disabled]="saving()">Salvar usuário</button></div></form></section>}

@@ -12,6 +12,12 @@ class EnsureActiveUser
     {
         abort_unless($request->user()?->ativo, 403, 'Sua conta está desativada.');
 
+        if ($request->user()->password_setup_required && ! in_array($request->path(), [
+            'api/auth/me', 'api/auth/password', 'api/auth/logout',
+        ], true)) {
+            abort(403, 'Defina sua senha no perfil para continuar.');
+        }
+
         return $next($request);
     }
 }

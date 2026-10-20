@@ -32,6 +32,9 @@ class UserController extends Controller
     public function update(UserRequest $request, User $user, AuditService $audit): JsonResponse
     {
         return DB::transaction(function () use ($request, $user, $audit): JsonResponse {
+            if ($user->password_setup_required) {
+                throw ValidationException::withMessages(['email' => 'A pessoa precisa definir a senha antes de editar este usuário.']);
+            }
             $admins = User::where('role', 'admin')->where('ativo', true)->lockForUpdate()->get();
             $data = $request->validated();
             if ($user->id === $request->user()->id && (! $data['ativo'] || $data['role'] !== 'admin')) {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountAccessRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,11 +34,30 @@ class AuthController extends Controller
 
     public function password(Request $request): JsonResponse
     {
+        $user = $request->user();
+        $passwordRules = ['required', 'max:128', Password::min(8)->mixedCase()->numbers()];
+        if (! $user->password_setup_required) {
+            $passwordRules[] = 'confirmed';
+        }
         $data = $request->validate([
-            'current_password' => ['required', 'current_password:web'],
-            'password' => ['required', 'confirmed', 'max:128', Password::min(12)->mixedCase()->numbers()],
+            'current_password' => $user->password_setup_required
+                ? ['nullable', 'string']
+                : ['required', 'current_password:web'],
+            'password' => $passwordRules,
         ]);
-        $request->user()->update(['password' => $data['password']]);
+
+        DB::transaction(function () use ($user, $data): void {
+            $wasPending = $user->password_setup_required;
+            $user->update(['password' => $data['password'], 'password_setup_required' => false]);
+            if ($wasPending) {
+                AccountAccessRequest::query()->where('email', $user->email)->where('status', 'approved')->update([
+                    'status' => 'completed',
+                    'setup_token_hash' => null,
+                    'setup_token_expires_at' => null,
+                    'completed_at' => now(),
+                ]);
+            }
+        });
         $request->session()->regenerate();
 
         return response()->json(['message' => 'Senha atualizada.']);

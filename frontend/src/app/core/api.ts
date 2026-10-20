@@ -9,12 +9,13 @@ export class Api {
   get<T>(path: string, params: Filters = {}): Promise<T> {
     return firstValueFrom(this.http.get<T>('/api/' + path, {params}));
   }
+  csrfCookie(): Promise<unknown> { return firstValueFrom(this.http.get('/sanctum/csrf-cookie')); }
   list<T>(path: string, params: Filters = {}): Promise<Page<T>> { return this.get<Page<T>>(path, params); }
   save<T>(path: string, data: unknown, id?: number): Promise<Envelope<T>> {
     return firstValueFrom(id ? this.http.put<Envelope<T>>(`/api/${path}/${id}`, data) : this.http.post<Envelope<T>>(`/api/${path}`, data));
   }
   post<T>(path: string, data: unknown = {}): Promise<T> { return firstValueFrom(this.http.post<T>('/api/' + path, data)); }
-  patch(path: string): Promise<unknown> { return firstValueFrom(this.http.patch('/api/' + path, {})); }
+  patch(path: string, data: unknown = {}): Promise<unknown> { return firstValueFrom(this.http.patch('/api/' + path, data)); }
   remove(path: string): Promise<unknown> { return firstValueFrom(this.http.delete('/api/' + path)); }
   async download(format: 'pdf' | 'csv', params: Filters): Promise<void> {
     const blob = await firstValueFrom(this.http.get('/api/relatorios/exportar', {params: {...params, formato: format}, responseType: 'blob'}));

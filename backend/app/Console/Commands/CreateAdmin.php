@@ -17,10 +17,10 @@ class CreateAdmin extends Command
     {
         $data = ['email' => $this->argument('email') ?? $this->ask('E-mail'),
             'name' => $this->option('name') ?: $this->ask('Nome'),
-            'password' => $this->secret('Senha (mínimo 12 caracteres, maiúscula, minúscula e número)')];
+            'password' => $this->secret('Senha (mínimo 8 caracteres, maiúscula, minúscula e número)')];
         $validator = Validator::make($data, [
             'email' => 'required|email|unique:users,email', 'name' => 'required|string|max:200',
-            'password' => ['required', 'max:128', Password::min(12)->mixedCase()->numbers()],
+            'password' => ['required', 'max:128', Password::min(8)->mixedCase()->numbers()],
         ]);
         if ($validator->fails()) {
             $this->error($validator->errors()->first());

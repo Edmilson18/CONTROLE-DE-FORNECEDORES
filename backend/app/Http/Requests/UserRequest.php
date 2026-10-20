@@ -18,7 +18,7 @@ class UserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:200'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($this->route('user'))],
-            'password' => [$this->route('user') ? 'nullable' : 'required', 'string', 'max:128', Password::min(12)->mixedCase()->numbers()],
+            'password' => [$this->route('user') ? 'nullable' : 'required', 'string', 'max:128', Password::min(8)->mixedCase()->numbers()],
             'role' => ['required', Rule::in(['admin', 'operador', 'consulta'])],
             'ativo' => ['required', 'boolean'],
         ];

@@ -11,6 +11,7 @@ Sistema web para acompanhar fornecedores, compras, pagamentos e vencimentos. A i
 - Relatórios com filtros e exportação em CSV e PDF.
 - Notificações internas de vencimentos próximos e atrasados.
 - Perfis de consulta, operador e administrador, com permissões diferentes.
+- Solicitação de acesso analisada pelo administrador, com resposta por e-mail e ativação segura no próprio perfil.
 - Histórico de alterações com usuário responsável e valores anteriores e atuais.
 
 ## Tecnologias e requisitos
@@ -49,8 +50,10 @@ Copy-Item backend\.env.example backend\.env
 Edite `backend\.env` e configure:
 
 - `APP_URL=http://127.0.0.1:8000`.
+- `FRONTEND_URL=http://127.0.0.1:4200`.
 - `DB_PASSWORD` com o mesmo valor de `DB_PASSWORD` do arquivo `.env` da raiz.
 - `SANCTUM_STATEFUL_DOMAINS` incluindo `127.0.0.1:4200` e `127.0.0.1:8000`.
+- Para enviar as decisões por e-mail, configure `MAIL_MAILER`, `MAIL_SCHEME`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` e `MAIL_FROM_ADDRESS` com os dados do seu provedor SMTP. Mantenha senhas e chaves apenas em `backend/.env`.
 
 Instale as dependências e prepare o Laravel:
 
@@ -64,7 +67,7 @@ php artisan migrate --force
 php artisan app:admin administrador@exemplo.com --name="Administrador"
 ```
 
-O comando `app:admin` solicita a senha sem exibi-la. Crie uma senha exclusiva com pelo menos 12 caracteres, incluindo letras maiúsculas e minúsculas e números. As migrações criam as tabelas de negócio e de suporte quando necessário; não é preciso importar o arquivo SQL para uma instalação nova.
+O comando `app:admin` solicita a senha sem exibi-la. Crie uma senha exclusiva com pelo menos 8 caracteres, incluindo letras maiúsculas e minúsculas e números. As migrações criam as tabelas de negócio e de suporte quando necessário; não é preciso importar o arquivo SQL para uma instalação nova.
 
 ### 3. Inicie a API e a interface
 
@@ -121,7 +124,13 @@ Os testes do backend usam SQLite em memória e não alteram o banco de desenvolv
 | Operador | Consultar e gerenciar fornecedores e compras, registrar pagamentos e alterar a própria senha |
 | Administrador | Todas as operações, incluindo usuários, auditoria, exclusões e estornos |
 
-Contas são criadas pelo administrador; não há cadastro público. Usuários desativados deixam de acessar o sistema.
+Qualquer pessoa pode enviar um pedido pelo link da tela de login, com e-mail obrigatório e justificativa de pelo menos 100 caracteres. O pedido aparece para o administrador em **Solicitações de acesso**. Cada conta precisa ser aprovada; não há criação automática. Usuários desativados deixam de acessar o sistema.
+
+Ao aprovar, a pessoa recebe um link com validade de 48 horas. A conta aprovada recebe o perfil **Operador**, que permite cadastrar fornecedores e compras sem acesso à administração de usuários. O link abre a sessão e leva diretamente a **Minha conta**, onde ela define a primeira senha sem informar uma senha anterior nem repetir a nova. Até concluir a etapa, as outras áreas ficam bloqueadas. Nas trocas seguintes, o perfil exige a senha atual e a confirmação da nova. Links de ativação expirados podem ser reenviados pelo administrador.
+
+A primeira senha precisa ter pelo menos 8 caracteres, incluindo maiúsculas, minúsculas e números; caractere especial não é obrigatório. Na atualização da conta, esta migração também pede que administradores já existentes definam uma senha no perfil na próxima sessão. O acesso normal exigirá a senha atual e a confirmação da nova nas trocas posteriores.
+
+Solicitações aprovadas ou recusadas recebem uma resposta por e-mail. O envio real exige SMTP válido. Com `MAIL_MAILER=log`, o sistema bloqueia a decisão para não indicar que o e-mail foi entregue quando não foi; pedidos recebidos continuam visíveis para o administrador até o SMTP ser configurado.
 
 ## API
 
@@ -130,6 +139,8 @@ Base local: `http://127.0.0.1:8000/api`. A autenticação usa sessão Sanctum e 
 | Método e rota | Ação | Acesso |
 | --- | --- | --- |
 | `POST /api/auth/login` | Iniciar sessão (`email`, `password`) | Público, com limite de tentativas |
+| `POST /api/solicitacoes-acesso` | Solicitar uma conta (`name`, `email`, `message` de pelo menos 100 caracteres) | Público, com limite de tentativas |
+| `POST /api/acessos/ativar` | Abrir sessão de ativação pelo token do e-mail | Público, token temporário |
 | `GET /api/auth/me` | Consultar a sessão | Autenticado |
 | `POST /api/auth/logout` | Encerrar sessão | Autenticado |
 | `PUT /api/auth/password` | Alterar senha | Autenticado |
@@ -146,6 +157,8 @@ Base local: `http://127.0.0.1:8000/api`. A autenticação usa sessão Sanctum e 
 | `PATCH /api/notificacoes/{id}/ler` | Marcar notificação como lida | Autenticado |
 | `GET, POST /api/usuarios`; `PUT /api/usuarios/{id}` | Gerenciar usuários e perfis | Administrador |
 | `GET /api/auditoria` | Consultar alterações | Administrador |
+| `GET /api/solicitacoes-acesso`; `PATCH /api/solicitacoes-acesso/{id}` | Analisar e responder pedidos de conta | Administrador |
+| `POST /api/solicitacoes-acesso/{id}/reenviar` | Reenviar link de ativação | Administrador |
 
 Compras e relatórios aceitam filtros `q`, `status`, `fornecedor_id`, `de`, `ate`, `page` e `per_page` (máximo de 100 itens). Datas usam `AAAA-MM-DD`; valores enviados à API usam ponto decimal e até duas casas. As respostas paginadas incluem `data`, `links` e `meta`.
 

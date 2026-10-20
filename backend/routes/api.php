@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountAccessController;
 use App\Http\Controllers\CompraController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FornecedorController;
@@ -8,6 +9,9 @@ use App\Http\Controllers\UserController;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+Route::post('solicitacoes-acesso', [AccountAccessController::class, 'store'])->middleware('throttle:3,10');
+Route::post('acessos/ativar', [AccountAccessController::class, 'activate'])->middleware('throttle:5,1');
 
 Route::middleware(['auth:sanctum', 'active', 'throttle:120,1'])->group(function (): void {
     Route::get('auth/me', fn (Request $request) => ['data' => $request->user()]);
@@ -26,6 +30,9 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:120,1'])->group(function 
         return response()->noContent();
     });
     Route::middleware('can:admin')->group(function (): void {
+        Route::get('solicitacoes-acesso', [AccountAccessController::class, 'index']);
+        Route::patch('solicitacoes-acesso/{accountAccessRequest}', [AccountAccessController::class, 'decide']);
+        Route::post('solicitacoes-acesso/{accountAccessRequest}/reenviar', [AccountAccessController::class, 'resend']);
         Route::apiResource('usuarios', UserController::class)->only(['index', 'store', 'update'])->parameters(['usuarios' => 'user']);
         Route::get('auditoria', fn () => AuditLog::with('user:id,name')->latest('id')->paginate(25));
     });

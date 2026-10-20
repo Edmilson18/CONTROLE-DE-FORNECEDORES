@@ -114,6 +114,9 @@ td { vertical-align:top; }
 .alert { padding:14px 18px; border-radius:6px; background:#eaf2fa; color:#244f72; margin-bottom:20px; font-size:13px; }
 .alert.error { background:#fbe9ec; color:#992d42; border-left:3px solid #b93845; }
 .alert.success { background:#e3f4ea; color:#236743; border-left:3px solid #2a8c60; }
+.alert.info { background:#eaf4f6; color:#245565; border-left:3px solid #268b91; }
+.text-link { color:var(--accent); font-weight:650; text-decoration:underline; text-underline-offset:3px; }
+.request-message { border-left:3px solid var(--accent); background:#f4f8f9; padding:16px 18px; border-radius:0 6px 6px 0; overflow-wrap:anywhere; }
 .export-panel { display:flex; justify-content:space-between; align-items:center; gap:24px; padding:28px; }
 .export-panel .muted { margin-top:8px; font-size:12px; max-width:500px; }
 .notice { display:flex; align-items:center; justify-content:space-between; padding:26px; gap:24px; border-bottom:1px solid var(--line); }

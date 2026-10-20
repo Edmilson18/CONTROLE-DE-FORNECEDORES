@@ -18,6 +18,10 @@ export class Auth {
     await firstValueFrom(this.http.get('/sanctum/csrf-cookie'));
     this.user.set((await firstValueFrom(this.http.post<Envelope<User>>('/api/auth/login', {email, password}))).data);
   }
+  async activateAccess(token: string): Promise<void> {
+    await firstValueFrom(this.http.get('/sanctum/csrf-cookie'));
+    this.user.set((await firstValueFrom(this.http.post<Envelope<User>>('/api/acessos/ativar', {token}))).data);
+  }
   async logout(): Promise<void> { await firstValueFrom(this.http.post('/api/auth/logout', {})); this.user.set(null); }
   changePassword(data: unknown): Promise<unknown> { return firstValueFrom(this.http.put('/api/auth/password', data)); }
 }
@@ -25,7 +29,15 @@ export const authGuard: CanActivateFn = async () => {
   const auth = inject(Auth); const router = inject(Router);
   return (await auth.load()) || router.parseUrl('/entrar');
 };
-export const adminGuard: CanActivateFn = () => inject(Auth).admin() || inject(Router).parseUrl('/');
+export const readyGuard: CanActivateFn = () => {
+  const auth = inject(Auth); const router = inject(Router);
+  return !auth.user()?.password_setup_required || router.parseUrl('/conta');
+};
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(Auth); const router = inject(Router);
+  if (auth.user()?.password_setup_required) { return router.parseUrl('/conta'); }
+  return auth.admin() || router.parseUrl('/');
+};
 export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router); const auth = inject(Auth);
   return next(req.clone({withCredentials: true, setHeaders: {Accept: 'application/json'}})).pipe(catchError((error: unknown) => {

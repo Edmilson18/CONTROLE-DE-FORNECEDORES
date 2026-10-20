@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../core/auth';
 import { errorMessage } from '../core/api';
 import { Feedback } from '../shared/feedback';
 
 @Component({
-  imports: [ReactiveFormsModule, Feedback],
+  imports: [ReactiveFormsModule, Feedback, RouterLink],
   template: `<main class="login-layout">
     <section class="login-story"><div class="brand-mark">CF<span>Controle de fornecedores</span></div>
       <div><p class="eyebrow">GESTÃO COM CLAREZA</p><h1>Da compra<br>ao pagamento.<br><em>Tudo à vista.</em></h1>
@@ -20,7 +20,7 @@ import { Feedback } from '../shared/feedback';
         <label>E-mail<input type="email" formControlName="email" autocomplete="username" placeholder="seu@email.com" required></label>
         <label>Senha<input type="password" formControlName="password" autocomplete="current-password" required></label>
         <button class="primary w-full" [disabled]="busy()">{{ busy() ? 'Entrando…' : 'Entrar no sistema' }} <span aria-hidden="true">→</span></button>
-      </form><p class="muted text-sm mt-8">Precisa de acesso? Solicite uma conta ao administrador.</p>
+      </form><p class="muted text-sm mt-8">Precisa de acesso? <a routerLink="/solicitar-acesso" class="text-link">Solicite uma conta ao administrador.</a></p>
     </div></section></main>`,
 })
 export class Login {

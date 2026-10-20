@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Auth } from '../core/auth';
 import { Api, errorMessage } from '../core/api';
-import { Envelope } from '../core/models';
+import { AccountAccessRequest, Envelope } from '../core/models';
 @Component({
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
   template: `<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
@@ -10,21 +10,27 @@ import { Envelope } from '../core/models';
       <a class="brand-mark" routerLink="/" (click)="open.set(false)">CF<span>Controle de<br>fornecedores</span></a>
       <p class="nav-caption">ESPAÇO DE TRABALHO</p>
       <nav aria-label="Menu principal">
-      @for (link of links; track link.path) {
-        <a [routerLink]="link.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: link.path === '/'}" (click)="open.set(false)">
-          <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>{{ link.name }}
-        </a>
-      }
-      @if (auth.admin()) {
-        <p class="nav-caption mt-8">ADMINISTRAÇÃO</p>
-        <a routerLink="/usuarios" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">♙</span>Usuários</a>
-        <a routerLink="/auditoria" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">≡</span>Histórico de alterações</a>
+      @if (!auth.user()?.password_setup_required) {
+        @for (link of links; track link.path) {
+          <a [routerLink]="link.path" routerLinkActive="active" [routerLinkActiveOptions]="{exact: link.path === '/'}" (click)="open.set(false)">
+            <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>{{ link.name }}
+          </a>
+        }
+        @if (auth.admin()) {
+          <p class="nav-caption mt-8">ADMINISTRAÇÃO</p>
+          <a routerLink="/solicitacoes-acesso" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">✉</span>Solicitações de acesso @if (pendingRequests() > 0) {<span class="count">{{ pendingRequests() }}</span>}</a>
+          <a routerLink="/usuarios" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">♙</span>Usuários</a>
+          <a routerLink="/auditoria" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">≡</span>Histórico de alterações</a>
+        }
+      } @else {
+        <p class="nav-caption">ATIVE SUA CONTA</p>
+        <a routerLink="/conta" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">♙</span>Minha conta</a>
       }</nav>
       <div class="sidebar-foot"><span class="status-dot"></span> Seu controle, em dia.</div>
     </aside><div class="main-column">
       <header class="topbar"><button class="secondary mobile-toggle" (click)="open.set(!open())" [attr.aria-expanded]="open()" aria-label="Abrir menu">☰</button>
         <span class="topbar-title">GESTÃO DE FORNECEDORES</span>
-        <div class="flex items-center gap-4"><a routerLink="/notificacoes" class="notification-link">Notificações @if (unread() > 0) {<span class="count">{{ unread() }}</span>}</a>
+        <div class="flex items-center gap-4">@if (!auth.user()?.password_setup_required) {<a routerLink="/notificacoes" class="notification-link">Notificações @if (unread() > 0) {<span class="count">{{ unread() }}</span>}</a>}
         <a routerLink="/conta" class="user-link"><span class="avatar">{{ auth.user()?.name?.slice(0,1) }}</span><span>{{ auth.user()?.name }}<small>{{ auth.user()?.role === 'admin' ? 'Administrador' : auth.user()?.role === 'operador' ? 'Operador' : 'Consulta' }}</small></span></a>
         <button class="link-button" (click)="logout()">Sair</button></div>
       </header>
@@ -35,10 +41,16 @@ import { Envelope } from '../core/models';
 })
 export class Shell implements OnInit {
   auth = inject(Auth); private api = inject(Api); private router = inject(Router);
-  open = signal(false); unread = signal(0); error = signal('');
+  open = signal(false); unread = signal(0); pendingRequests = signal(0); error = signal('');
   links = [{path: '/', name: 'Visão geral', icon: '◫'}, {path: '/fornecedores', name: 'Fornecedores', icon: '▦'},
     {path: '/compras', name: 'Compras e pagamentos', icon: '↗'}, {path: '/relatorios', name: 'Relatórios', icon: '▤'}];
-  ngOnInit(): void { void this.api.get<Envelope<{nao_lidas: number}>>('notificacoes/contagem').then(r => this.unread.set(r.data.nao_lidas)).catch(() => {}); }
+  ngOnInit(): void {
+    void this.api.get<Envelope<{nao_lidas: number}>>('notificacoes/contagem').then(r => this.unread.set(r.data.nao_lidas)).catch(() => {});
+    if (this.auth.admin()) {
+      void this.api.list<AccountAccessRequest>('solicitacoes-acesso', {status: 'pending', per_page: 1})
+        .then(r => this.pendingRequests.set(r.meta?.total ?? r.total ?? 0)).catch(() => {});
+    }
+  }
   async logout(): Promise<void> {
     try { await this.auth.logout(); await this.router.navigateByUrl('/entrar'); }
     catch (e) { this.error.set(errorMessage(e)); }
