@@ -16,10 +16,12 @@ import { AccountAccessRequest, Envelope } from '../core/models';
             <span class="nav-icon" aria-hidden="true">{{ link.icon }}</span>{{ link.name }}
           </a>
         }
+        @if (auth.canEdit()) {
+          <a routerLink="/usuarios" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">♙</span>{{ auth.admin() ? 'Usuários' : 'Contas de consulta' }}</a>
+        }
         @if (auth.admin()) {
           <p class="nav-caption mt-8">ADMINISTRAÇÃO</p>
           <a routerLink="/solicitacoes-acesso" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">✉</span>Solicitações de acesso @if (pendingRequests() > 0) {<span class="count">{{ pendingRequests() }}</span>}</a>
-          <a routerLink="/usuarios" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">♙</span>Usuários</a>
           <a routerLink="/auditoria" routerLinkActive="active" (click)="open.set(false)"><span class="nav-icon" aria-hidden="true">≡</span>Histórico de alterações</a>
         }
       } @else {

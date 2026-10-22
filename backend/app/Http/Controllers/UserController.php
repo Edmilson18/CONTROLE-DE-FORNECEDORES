@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FilterRequest;
+use App\Http\Requests\ConsultationUserRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Services\AuditService;
@@ -21,8 +22,18 @@ class UserController extends Controller
 
     public function store(UserRequest $request, AuditService $audit): JsonResponse
     {
-        return DB::transaction(function () use ($request, $audit): JsonResponse {
-            $user = User::create($request->validated());
+        return $this->createUser($request->validated(), $audit);
+    }
+
+    public function storeConsultation(ConsultationUserRequest $request, AuditService $audit): JsonResponse
+    {
+        return $this->createUser([...$request->validated(), 'role' => 'consulta', 'ativo' => true], $audit);
+    }
+
+    private function createUser(array $data, AuditService $audit): JsonResponse
+    {
+        return DB::transaction(function () use ($data, $audit): JsonResponse {
+            $user = User::create($data);
             $audit->record('criar', $user);
 
             return response()->json(['data' => $user], 201);

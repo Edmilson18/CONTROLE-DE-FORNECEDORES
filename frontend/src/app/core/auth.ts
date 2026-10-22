@@ -38,6 +38,11 @@ export const adminGuard: CanActivateFn = () => {
   if (auth.user()?.password_setup_required) { return router.parseUrl('/conta'); }
   return auth.admin() || router.parseUrl('/');
 };
+export const userCreationGuard: CanActivateFn = () => {
+  const auth = inject(Auth); const router = inject(Router);
+  if (auth.user()?.password_setup_required) { return router.parseUrl('/conta'); }
+  return auth.canEdit() || router.parseUrl('/');
+};
 export const apiInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router); const auth = inject(Auth);
   return next(req.clone({withCredentials: true, setHeaders: {Accept: 'application/json'}})).pipe(catchError((error: unknown) => {

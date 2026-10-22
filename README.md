@@ -84,7 +84,7 @@ npm ci
 npm start
 ```
 
-Abra [http://127.0.0.1:4200](http://127.0.0.1:4200). Mantenha o mesmo endereço `127.0.0.1` nos dois serviços para que os cookies de sessão e a proteção CSRF funcionem corretamente. O proxy do Angular encaminha as chamadas de `/api` e `/sanctum` para a API Laravel.
+Abra [http://127.0.0.1:4200](http://127.0.0.1:4200), ou acesse a interface pelo `index.php` do projeto, que encaminha para o mesmo Angular. Mantenha o mesmo endereço `127.0.0.1` nos dois serviços para que os cookies de sessão e a proteção CSRF funcionem corretamente. O proxy do Angular encaminha as chamadas de `/api` e `/sanctum` para a API Laravel.
 
 O `index.php` e as URLs PHP antigas redirecionam para a interface Angular. Para esses redirecionamentos funcionarem, mantenha o servidor Angular iniciado.
 
@@ -121,12 +121,12 @@ Os testes do backend usam SQLite em memória e não alteram o banco de desenvolv
 | Perfil | Permissões principais |
 | --- | --- |
 | Consulta | Consultar fornecedores, compras, relatórios e notificações |
-| Operador | Consultar e gerenciar fornecedores e compras, registrar pagamentos e alterar a própria senha |
+| Operador | Consultar e gerenciar fornecedores e compras, registrar pagamentos, criar contas de consulta e alterar a própria senha |
 | Administrador | Todas as operações, incluindo usuários, auditoria, exclusões e estornos |
 
 Qualquer pessoa pode enviar um pedido pelo link da tela de login, com e-mail obrigatório e justificativa de pelo menos 100 caracteres. O pedido aparece para o administrador em **Solicitações de acesso**. Cada conta precisa ser aprovada; não há criação automática. Usuários desativados deixam de acessar o sistema.
 
-Ao aprovar, a pessoa recebe um link com validade de 48 horas. A conta aprovada recebe o perfil **Operador**, que permite cadastrar fornecedores e compras sem acesso à administração de usuários. O link abre a sessão e leva diretamente a **Minha conta**, onde ela define a primeira senha sem informar uma senha anterior nem repetir a nova. Até concluir a etapa, as outras áreas ficam bloqueadas. Nas trocas seguintes, o perfil exige a senha atual e a confirmação da nova. Links de ativação expirados podem ser reenviados pelo administrador.
+Ao aprovar, a pessoa recebe um link com validade de 48 horas. A conta aprovada recebe o perfil **Operador**, que permite cadastrar fornecedores e compras e criar contas ativas com perfil **Consulta**. Operadores não podem alterar perfis, consultar a lista de usuários ou administrar contas. O link abre a sessão e leva diretamente a **Minha conta**, onde ela define a primeira senha sem informar uma senha anterior nem repetir a nova. Até concluir a etapa, as outras áreas ficam bloqueadas. Nas trocas seguintes, o perfil exige a senha atual e a confirmação da nova. Links de ativação expirados podem ser reenviados pelo administrador.
 
 A primeira senha precisa ter pelo menos 8 caracteres, incluindo maiúsculas, minúsculas e números; caractere especial não é obrigatório. Na atualização da conta, esta migração também pede que administradores já existentes definam uma senha no perfil na próxima sessão. O acesso normal exigirá a senha atual e a confirmação da nova nas trocas posteriores.
 
@@ -155,7 +155,9 @@ Base local: `http://127.0.0.1:8000/api`. A autenticação usa sessão Sanctum e 
 | `GET /api/relatorios/exportar?formato=csv\|pdf` | Exportar relatório | Todos os perfis |
 | `GET /api/notificacoes` | Listar notificações | Autenticado |
 | `PATCH /api/notificacoes/{id}/ler` | Marcar notificação como lida | Autenticado |
-| `GET, POST /api/usuarios`; `PUT /api/usuarios/{id}` | Gerenciar usuários e perfis | Administrador |
+| `POST /api/usuarios` | Criar usuário com perfil definido | Administrador |
+| `POST /api/usuarios/consulta` | Criar conta ativa de consulta | Operador |
+| `GET /api/usuarios`; `PUT /api/usuarios/{id}` | Listar e editar usuários e perfis | Administrador |
 | `GET /api/auditoria` | Consultar alterações | Administrador |
 | `GET /api/solicitacoes-acesso`; `PATCH /api/solicitacoes-acesso/{id}` | Analisar e responder pedidos de conta | Administrador |
 | `POST /api/solicitacoes-acesso/{id}/reenviar` | Reenviar link de ativação | Administrador |

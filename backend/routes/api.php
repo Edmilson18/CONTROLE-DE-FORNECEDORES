@@ -22,6 +22,7 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:120,1'])->group(function 
     Route::post('pagamentos/{pagamento}/estorno', [CompraController::class, 'reverse']);
     Route::get('relatorios', [ReportController::class, 'index']);
     Route::get('relatorios/exportar', [ReportController::class, 'export'])->middleware('throttle:10,1');
+    Route::post('usuarios/consulta', [UserController::class, 'storeConsultation'])->middleware('can:operator');
     Route::get('notificacoes', fn (Request $request) => $request->user()->notifications()->paginate(20));
     Route::get('notificacoes/contagem', fn (Request $request) => ['data' => ['nao_lidas' => $request->user()->unreadNotifications()->count()]]);
     Route::patch('notificacoes/{id}/ler', function (Request $request, string $id) {
@@ -30,10 +31,11 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:120,1'])->group(function 
         return response()->noContent();
     });
     Route::middleware('can:admin')->group(function (): void {
+        Route::post('usuarios', [UserController::class, 'store']);
         Route::get('solicitacoes-acesso', [AccountAccessController::class, 'index']);
         Route::patch('solicitacoes-acesso/{accountAccessRequest}', [AccountAccessController::class, 'decide']);
         Route::post('solicitacoes-acesso/{accountAccessRequest}/reenviar', [AccountAccessController::class, 'resend']);
-        Route::apiResource('usuarios', UserController::class)->only(['index', 'store', 'update'])->parameters(['usuarios' => 'user']);
+        Route::apiResource('usuarios', UserController::class)->only(['index', 'update'])->parameters(['usuarios' => 'user']);
         Route::get('auditoria', fn () => AuditLog::with('user:id,name')->latest('id')->paginate(25));
     });
 });

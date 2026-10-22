@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, adminGuard, readyGuard } from './core/auth';
+import { authGuard, adminGuard, readyGuard, userCreationGuard } from './core/auth';
 import { Shell } from './layout/shell';
 
 export const routes: Routes = [
@@ -12,7 +12,7 @@ export const routes: Routes = [
     {path: 'compras', title: 'Compras e pagamentos', canActivate: [readyGuard], loadComponent: () => import('./pages/purchases').then(m => m.Purchases)},
     {path: 'compras/:id', title: 'Detalhes da compra', canActivate: [readyGuard], loadComponent: () => import('./pages/purchase-detail').then(m => m.PurchaseDetail)},
     {path: 'relatorios', title: 'Relatórios', canActivate: [readyGuard], loadComponent: () => import('./pages/reports').then(m => m.Reports)},
-    {path: 'usuarios', title: 'Usuários', canActivate: [readyGuard, adminGuard], loadComponent: () => import('./pages/users').then(m => m.Users)},
+    {path: 'usuarios', title: 'Usuários', canActivate: [readyGuard, userCreationGuard], loadComponent: () => import('./pages/user-management').then(m => m.Users)},
     {path: 'solicitacoes-acesso', title: 'Solicitações de acesso', canActivate: [readyGuard, adminGuard], loadComponent: () => import('./pages/access-requests').then(m => m.AccessRequests)},
     {path: 'auditoria', title: 'Histórico de alterações', canActivate: [readyGuard, adminGuard], loadComponent: () => import('./pages/audit').then(m => m.Audit)},
     {path: 'notificacoes', title: 'Notificações', canActivate: [readyGuard], loadComponent: () => import('./pages/notifications').then(m => m.Notifications)},

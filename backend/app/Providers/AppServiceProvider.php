@@ -20,5 +20,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Illuminate\Support\Facades\Gate::define('admin', fn (\App\Models\User $user): bool => $user->ativo && $user->role === 'admin');
+        \Illuminate\Support\Facades\Gate::define('operator', fn (\App\Models\User $user): bool => $user->ativo && $user->role === 'operador');
     }
 }
