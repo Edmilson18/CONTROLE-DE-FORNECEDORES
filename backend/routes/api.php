@@ -21,6 +21,7 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:120,1'])->group(function 
     Route::post('compras/{compra}/pagamentos', [CompraController::class, 'pay']);
     Route::post('pagamentos/{pagamento}/estorno', [CompraController::class, 'reverse']);
     Route::get('relatorios', [ReportController::class, 'index']);
+    Route::get('relatorios/fornecedores', [ReportController::class, 'suppliers']);
     Route::get('relatorios/exportar', [ReportController::class, 'export'])->middleware('throttle:10,1');
     Route::post('usuarios/consulta', [UserController::class, 'storeConsultation'])->middleware('can:operator');
     Route::get('notificacoes', fn (Request $request) => $request->user()->notifications()->paginate(20));

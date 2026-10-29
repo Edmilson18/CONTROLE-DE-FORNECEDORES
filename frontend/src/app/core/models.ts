@@ -22,4 +22,5 @@ export interface Dashboard { fornecedores: number; compras: number; saldo_penden
 export interface Notice { id: string; data: {compra_id: number; titulo: string; mensagem: string}; read_at: string | null; created_at: string; }
 export interface Audit { id: number; acao: string; entidade: string; entidade_id: number; antes: Record<string, unknown>; depois: Record<string, unknown>; user: {name: string} | null; created_at: string; }
 export interface Report { quantidade: number; total: string; saldo: string; }
+export interface SupplierReport { id: number; nome: string; cnpj: string; compras: number; contratado: string; pago: string; saldo: string; }
 export type Filters = Record<string, string | number>;

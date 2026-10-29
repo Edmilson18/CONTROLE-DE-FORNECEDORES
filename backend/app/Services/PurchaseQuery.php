@@ -15,7 +15,7 @@ class PurchaseQuery
             }))
             ->when($filters['status'] ?? null, fn (Builder $q, string $status) => $q->where('status', $status))
             ->when($filters['fornecedor_id'] ?? null, fn (Builder $q, int $id) => $q->where('fornecedores_id', $id))
-            ->when($filters['de'] ?? null, fn (Builder $q, string $date) => $q->whereDate('data', '>=', $date))
-            ->when($filters['ate'] ?? null, fn (Builder $q, string $date) => $q->whereDate('data', '<=', $date));
+            ->when($filters['de'] ?? null, fn (Builder $q, string $date) => $q->where('data', '>=', $date))
+            ->when($filters['ate'] ?? null, fn (Builder $q, string $date) => $q->where('data', '<=', $date));
     }
 }
